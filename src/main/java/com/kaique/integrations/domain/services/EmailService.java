@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.kaique.integrations.domain.dto.EmailDto;
+import com.kaique.integrations.domain.exceptions.EmailException;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
@@ -34,10 +35,10 @@ public class EmailService {
 			request.setBody(mail.build());
 			
 			@SuppressWarnings("unused")
-			Response response = sendGrid.api(request);
+			Response  response = sendGrid.api(request);
 			
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new EmailException(e.getMessage());
 		}
 	}
 }
