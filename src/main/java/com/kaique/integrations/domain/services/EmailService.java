@@ -3,6 +3,7 @@ package com.kaique.integrations.domain.services;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.kaique.integrations.domain.dto.EmailDto;
@@ -20,24 +21,29 @@ public class EmailService {
 
 	@Autowired
 	private SendGrid sendGrid;
-	
+
 	public void sendEmail(EmailDto dto) {
-		
-		Email from = new Email(dto.getFromEmail() , dto.getFromName());
+
+		Email from = new Email(dto.getFromEmail(), dto.getFromName());
 		Email to = new Email(dto.getTo());
-		Content content = new Content(dto.getContentType() , dto.getBody());
+		Content content = new Content(dto.getContentType(), dto.getBody());
 		Mail mail = new Mail(from, dto.getSubject(), to, content);
-		
+
 		Request request = new Request();
 		try {
 			request.setMethod(Method.POST);
 			request.setEndpoint("mail/send");
 			request.setBody(mail.build());
 			
-			@SuppressWarnings("unused")
-			Response  response = sendGrid.api(request);
+
+			Response response = sendGrid.api(request);
+
+			if (response.getStatusCode() >= 400 && response.getStatusCode() <= 500) 
+				throw new EmailException(response.getBody());
 			
-		} catch (IOException e) {
+		} catch (
+
+		IOException e) {
 			throw new EmailException(e.getMessage());
 		}
 	}
